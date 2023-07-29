@@ -52,8 +52,6 @@ public class PagamentoService {
 
         Map<String, Object> resp = endpointsDePagamentoService.requestPayment(dados);
 
-        System.out.println("respPagamentoService"+ resp);
-
         if(!resp.isEmpty()){
             return resp;
         }else{
