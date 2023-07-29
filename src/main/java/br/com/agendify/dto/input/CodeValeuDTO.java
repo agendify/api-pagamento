@@ -1,4 +1,4 @@
-package br.com.agendify.dto;
+package br.com.agendify.dto.input;
 
 import lombok.Getter;
 import lombok.Setter;

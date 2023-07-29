@@ -8,9 +8,9 @@ if [ "$branch" != "master" ]; then
     if ! head -1 "$1" | grep -qE "^(ALT|ADD|FIX|DEL|GIT): (TR)-[0-9]{1,}. .{1,}$"; then
         echo "$(head -1 "$1")" >&2
         echo "Aborting commit. Your commit message is invalid." >&2
-        echo "Format should be: <type>: <change type>: <country>: <jira code>. <description>" >&2
+        echo "Format should be: <type>: <trellocode> <description>" >&2
         echo "<type> must be: ALT, ADD, FIX, DEL, GIT" >&2
         echo "Like: ALT: TR-999. MENSAGEM DO COMMIT" >&2
-        EXIT 1
+        exit 1
     fi
 fi

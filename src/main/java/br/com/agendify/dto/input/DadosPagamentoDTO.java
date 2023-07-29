@@ -1,4 +1,4 @@
-package br.com.agendify.dto;
+package br.com.agendify.dto.input;
 
 
 import lombok.Getter;
@@ -15,6 +15,6 @@ public class DadosPagamentoDTO {
     private CodeValeuDTO amount;
     private PaymentMethodDTO payment_method;
     private List<String> notification_urls;
-    private metadataDTO metadata;
+    private MetadataDTO metadata;
 
 }

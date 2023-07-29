@@ -1,11 +1,14 @@
-package br.com.agendify.dto;
+package br.com.agendify.dto.input;
 
 
+import br.com.agendify.dto.output.CardResponseDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentMethodDTO {
 
     private String type;

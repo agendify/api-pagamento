@@ -1,10 +1,12 @@
 package br.com.agendify.service;
 
-import br.com.agendify.dto.DadosPagamentoDTO;
+import br.com.agendify.dto.input.DadosPagamentoDTO;
+import br.com.agendify.dto.output.RespPagSeguroDTO;
+import br.com.agendify.mensages.MessageCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +16,11 @@ public class EndpointsDePagamentoService {
     private static final String URL_BASE = "https://sandbox.api.pagseguro.com/charges";
     private static final String TOKEN_ACESS = "446A6E9174254348827625BDCCFCB777";
 
-    public Map<String, Object> requestPayment(DadosPagamentoDTO dados) throws Exception {
+    public RespPagSeguroDTO requestPayment(DadosPagamentoDTO dados) throws Exception {
 
         ResponseEntity<String>  resp;
 
-        Map<String, Object> map;
+        RespPagSeguroDTO meuObjeto;
 
         try{
 
@@ -31,32 +33,17 @@ public class EndpointsDePagamentoService {
 
             resp = restTemplate.exchange(URL_BASE, HttpMethod.POST, requestEntity, String.class);
 
-            map = stringToMap(String.valueOf(resp));
+            String respBody = resp.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            meuObjeto = objectMapper.readValue(respBody, RespPagSeguroDTO.class);
 
         }catch (Exception e){
-            throw new Exception("Erro ao fazer requisação de pagamento " + "Tipo de pagamento:" + dados.getPayment_method() + "Valor Cobrado:" +
-                    dados.getAmount().getValue());
+            throw new Exception(MessageCode.ERRO_REQUEST_PAYMENT.getMessage());
         }
 
-        return map;
+        return meuObjeto;
     }
 
-
-    public static Map<String, Object> stringToMap(String input) {
-        Map<String, Object> map = new HashMap<>();
-
-        // Dividir a string pelos separadores e criar pares chave-valor no mapa
-        String[] keyValuePairs = input.split(", ");
-        for (String pair : keyValuePairs) {
-            String[] keyValue = pair.split(": ");
-            if (keyValue.length == 2) {
-                String key = keyValue[0].trim();
-                Object value = keyValue[1].trim();
-                map.put(key, value);
-            }
-        }
-
-        return map;
-    }
 
 }

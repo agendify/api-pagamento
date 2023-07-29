@@ -1,15 +1,13 @@
 package br.com.agendify.service;
-import br.com.agendify.dto.DadosPagamentoDTO;
+import br.com.agendify.dto.input.DadosPagamentoDTO;
+import br.com.agendify.dto.output.RespPagSeguroDTO;
+import br.com.agendify.mensages.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class PagamentoService {
@@ -19,14 +17,16 @@ public class PagamentoService {
     EndpointsDePagamentoService endpointsDePagamentoService;
 
 
-    public Map<String, Object> methodPaymentCredit(DadosPagamentoDTO dados) throws Exception {
+    public RespPagSeguroDTO methodPaymentCredit(DadosPagamentoDTO dados) throws Exception {
+
+        System.out.println(dados);
 
         if (dados == null || dados.getPayment_method() == null || dados.getPayment_method().getCard() == null){
-            throw new Exception("INPUT de requisação inválido.");
+            throw new Exception(MessageCode.INVALID_REQUEST_INPUT.getMessage());
         }
 
         if (dados.getPayment_method().getType().isEmpty() || dados.getPayment_method().getType().isBlank() || !dados.getPayment_method().getType().equals("CREDIT_CARD")){
-            throw new Exception("Tipo de Pagamento inválido");
+            throw new Exception(MessageCode.INVALID_PAYMENT_TYPE.getMessage());
         }
 
         if(!dados.getPayment_method().getCard().getHolder().getName().isEmpty() || !dados.getPayment_method().getCard().getHolder().getName().isBlank()){
@@ -39,26 +39,20 @@ public class PagamentoService {
             LocalDate dataFormatada = LocalDate.parse(dataRealCartao, formatter);
 
             if (dataFormatada.isBefore(dataAtual)){
-                throw new Exception("Cartão Vencido");
+                throw new Exception(MessageCode.EXPIRED_CARD.getMessage());
             }
 
             if(dados.getPayment_method().getCard().getSecurity_code().length() != 3){
-                throw new Exception("Numero de segurança é inválido");
+                throw new Exception(MessageCode.SECURITY_NUMBER_INVALID.getMessage());
             }
 
         }else{
-            throw new Exception("Nome do Comprador é obrigatório");
+            throw new Exception(MessageCode.BUYERS_NAME_REQUIRED.getMessage());
         }
 
-        Map<String, Object> resp = endpointsDePagamentoService.requestPayment(dados);
+        RespPagSeguroDTO resp = endpointsDePagamentoService.requestPayment(dados);
 
-        if(!resp.isEmpty()){
-            return resp;
-        }else{
-            return (Map<String, Object>) resp.put("ERROR", "ERRO");
-        }
-
-
+        return resp;
     }
 
 
